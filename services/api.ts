@@ -1,3 +1,4 @@
+
 import type { Tutor, Review, User, Conversation, Message } from '../types';
 import { messagingService, RealtimeMessagePayload } from './messagingService';
 
@@ -14,6 +15,13 @@ const allTutorsData: Tutor[] = [
     experience: 12,
     qualifications: ['PhD in Physics, MIT', 'M.S. in Applied Mathematics'],
     hourlyRate: 75,
+    availability: {
+      Monday: ['4:00 PM - 8:00 PM'],
+      Tuesday: ['4:00 PM - 8:00 PM'],
+      Wednesday: ['4:00 PM - 8:00 PM'],
+      Thursday: ['4:00 PM - 8:00 PM'],
+      Friday: ['4:00 PM - 8:00 PM'],
+    },
     isVerified: true,
   },
   {
@@ -28,6 +36,11 @@ const allTutorsData: Tutor[] = [
     experience: 7,
     qualifications: ['B.S. in Computer Science, Stanford', 'Google Certified Developer'],
     hourlyRate: 60,
+    availability: {
+        Tuesday: ['6:00 PM - 9:00 PM'],
+        Thursday: ['6:00 PM - 9:00 PM'],
+        Saturday: ['10:00 AM - 4:00 PM'],
+    },
     isVerified: true,
   },
   {
@@ -42,6 +55,7 @@ const allTutorsData: Tutor[] = [
     experience: 8,
     qualifications: ['M.A. in Linguistics', 'Certified Language Instructor'],
     hourlyRate: 45,
+    availability: {},
     isVerified: false,
   },
   {
@@ -56,6 +70,11 @@ const allTutorsData: Tutor[] = [
     experience: 4,
     qualifications: ['B.S. in Biology, UChicago', '99th Percentile MCAT Score'],
     hourlyRate: 65,
+    availability: {
+        Monday: ['6:00 PM - 10:00 PM'],
+        Wednesday: ['6:00 PM - 10:00 PM'],
+        Sunday: ['12:00 PM - 5:00 PM'],
+    },
     isVerified: true,
   },
     {
@@ -70,6 +89,13 @@ const allTutorsData: Tutor[] = [
     experience: 9,
     qualifications: ['M.F.A. in Creative Writing, Columbia', 'Certified SAT Instructor'],
     hourlyRate: 70,
+    availability: {
+        Monday: ['3:00 PM - 7:00 PM'],
+        Tuesday: ['3:00 PM - 7:00 PM'],
+        Wednesday: ['3:00 PM - 7:00 PM'],
+        Thursday: ['3:00 PM - 7:00 PM'],
+        Friday: ['3:00 PM - 7:00 PM'],
+    },
     isVerified: true,
   },
   {
@@ -84,6 +110,10 @@ const allTutorsData: Tutor[] = [
     experience: 6,
     qualifications: ['M.A. in History, UC Berkeley'],
     hourlyRate: 50,
+    availability: {
+        Saturday: ['1:00 PM - 5:00 PM'],
+        Sunday: ['1:00 PM - 5:00 PM'],
+    },
     isVerified: false,
   },
   {
@@ -98,6 +128,11 @@ const allTutorsData: Tutor[] = [
     experience: 10,
     qualifications: ['B.F.A. in Graphic Design, RISD', 'Adobe Certified Expert'],
     hourlyRate: 55,
+    availability: {
+        Monday: ['10:00 AM - 5:00 PM'],
+        Wednesday: ['10:00 AM - 5:00 PM'],
+        Friday: ['10:00 AM - 5:00 PM'],
+    },
     isVerified: true,
   },
 ];
@@ -209,13 +244,41 @@ export const api = {
     console.log('Registering user:', userData);
     return { success: true, message: `Registration successful for ${userData.name}!` };
   },
-  loginUser: async (credentials: any): Promise<{ success: boolean; message: string; token?: string; user?: User }> => {
+  loginUser: async (credentials: any): Promise<{ success: boolean; message: string; token?: string; user?: User | Tutor }> => {
     await delay(1000);
     console.log('Logging in with:', credentials);
+
+    if (credentials.email === 'eleanor@example.com' && credentials.password === 'password') {
+      const tutorUser = allTutorsData.find(t => t.id === '1');
+      return { success: true, message: 'Tutor login successful!', token: 'fake-jwt-token-tutor', user: tutorUser };
+    }
     if (credentials.email === 'test@example.com' && credentials.password === 'password') {
       return { success: true, message: 'Login successful!', token: 'fake-jwt-token', user: mockUsers[0] };
     }
     return { success: false, message: 'Invalid email or password.' };
+  },
+  updateUserProfile: async (userId: string, updates: Partial<Tutor>): Promise<{ success: boolean; user?: User | Tutor }> => {
+    await delay(500);
+    const tutorIndex = allTutorsData.findIndex(t => t.id === userId);
+    if (tutorIndex !== -1) {
+        const updatedTutor = { ...allTutorsData[tutorIndex], ...updates };
+        allTutorsData[tutorIndex] = updatedTutor;
+        
+        const userIndexInMocks = mockUsers.findIndex(u => u.id === userId);
+        if (userIndexInMocks !== -1) {
+            mockUsers[userIndexInMocks] = { ...mockUsers[userIndexInMocks], name: updatedTutor.name, imageUrl: updatedTutor.imageUrl };
+        }
+        return { success: true, user: updatedTutor };
+    }
+
+    const userIndex = mockUsers.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+        const updatedUser = { ...mockUsers[userIndex], ...updates };
+        mockUsers[userIndex] = updatedUser as User;
+        return { success: true, user: updatedUser };
+    }
+
+    return { success: false };
   },
   sendMessage: async (data: { senderId: string; receiverId: string; text: string }): Promise<Message> => {
     await delay(200); // Shorter delay for sending

@@ -74,56 +74,86 @@ const SearchPage = () => {
     setSearchParams(params);
   };
 
+  const handleClearFilters = () => {
+    setLocation('');
+    setSubject('');
+    setMinRate('');
+    setMaxRate('');
+    setMinExperience('');
+    setSearchParams({});
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Find Your Tutor</h2>
-        <form onSubmit={handleSearch} className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Find Your Tutor</h2>
+        <form onSubmit={handleSearch} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input 
               type="text" 
               placeholder="Location (e.g., New York, NY)" 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
             <input 
               type="text" 
               placeholder="Subject (e.g., Physics)" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-                type="number"
-                placeholder="Min Rate ($/hr)"
-                value={minRate}
-                onChange={(e) => setMinRate(e.target.value)}
-                min="0"
-                className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-            <input
-                type="number"
-                placeholder="Max Rate ($/hr)"
-                value={maxRate}
-                onChange={(e) => setMaxRate(e.target.value)}
-                min="0"
-                className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-            <input
-                type="number"
-                placeholder="Min Experience (years)"
-                value={minExperience}
-                onChange={(e) => setMinExperience(e.target.value)}
-                min="0"
-                className="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t">
+            <div>
+              <label htmlFor="minRate" className="block text-sm font-medium text-gray-700 mb-1">Min Rate ($/hr)</label>
+              <input
+                  id="minRate"
+                  type="number"
+                  placeholder="e.g., 20"
+                  value={minRate}
+                  onChange={(e) => setMinRate(e.target.value)}
+                  min="0"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+            </div>
+            <div>
+              <label htmlFor="maxRate" className="block text-sm font-medium text-gray-700 mb-1">Max Rate ($/hr)</label>
+              <input
+                  id="maxRate"
+                  type="number"
+                  placeholder="e.g., 100"
+                  value={maxRate}
+                  onChange={(e) => setMaxRate(e.target.value)}
+                  min="0"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+            </div>
+            <div>
+              <label htmlFor="minExperience" className="block text-sm font-medium text-gray-700 mb-1">Min Experience (years)</label>
+              <input
+                  id="minExperience"
+                  type="number"
+                  placeholder="e.g., 2"
+                  value={minExperience}
+                  onChange={(e) => setMinExperience(e.target.value)}
+                  min="0"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+            </div>
           </div>
-          <div>
-            <button type="submit" disabled={isLoading} className="w-full md:w-auto bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold disabled:bg-blue-300">
-                {isLoading ? 'Searching...' : 'Search'}
+          
+          <div className="flex flex-col sm:flex-row justify-end items-center pt-6 border-t gap-4">
+             <button
+              type="button"
+              onClick={handleClearFilters}
+              className="w-full sm:w-auto bg-gray-100 border border-gray-300 text-gray-700 px-8 py-3 rounded-md hover:bg-gray-200 transition-colors font-semibold"
+            >
+              Clear Filters
+            </button>
+            <button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold disabled:bg-blue-300">
+                {isLoading ? 'Searching...' : 'Search Tutors'}
             </button>
           </div>
         </form>

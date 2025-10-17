@@ -10,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import TutorProfilePage from './pages/TutorProfilePage';
 import InboxPage from './pages/InboxPage';
 import ConversationPage from './pages/ConversationPage';
+import ProfilePage from './pages/ProfilePage';
+import EditProfilePage from './pages/EditProfilePage';
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
             <Route path="/tutor/:id" element={<TutorProfilePage />} />
             <Route path="/inbox" element={<InboxPage />} />
             <Route path="/conversation/:id" element={<ConversationPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfilePage />} />
           </Routes>
         </main>
         <Footer />

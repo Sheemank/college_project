@@ -1,29 +1,45 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import InboxIcon from './icons/InboxIcon';
 
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // This is a simple check. In a real app, you might want to validate the token.
-    const token = localStorage.getItem('authToken');
-    setIsLoggedIn(!!token);
-
-    // Listen for storage changes to update UI across tabs
-    const handleStorageChange = () => {
-        setIsLoggedIn(!!localStorage.getItem('authToken'));
+    const updateAuthState = () => {
+      const token = localStorage.getItem('authToken');
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      setIsLoggedIn(!!token);
+      setCurrentUser(user);
     };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    updateAuthState(); // Initial check
+
+    window.addEventListener('storage', updateAuthState);
+    return () => window.removeEventListener('storage', updateAuthState);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
     setIsLoggedIn(false);
+    setCurrentUser(null);
+    setIsDropdownOpen(false);
     navigate('/');
   };
 
@@ -36,7 +52,7 @@ const Header = () => {
               FindMyTutor
             </Link>
           </div>
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             <NavLink to="/" className={({ isActive }) => `text-gray-500 hover:text-blue-600 transition-colors ${isActive ? 'text-blue-600 font-semibold' : ''}`}>Home</NavLink>
             <NavLink to="/search" className={({ isActive }) => `text-gray-500 hover:text-blue-600 transition-colors ${isActive ? 'text-blue-600 font-semibold' : ''}`}>Find a Tutor</NavLink>
              {isLoggedIn && (
@@ -47,10 +63,20 @@ const Header = () => {
              )}
           </nav>
           <div className="flex items-center space-x-4">
-            {isLoggedIn ? (
-              <button onClick={handleLogout} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                Log Out
-              </button>
+            {isLoggedIn && currentUser ? (
+              <div className="relative" ref={dropdownRef}>
+                <button onClick={() => setIsDropdownOpen(prev => !prev)} className="flex items-center space-x-2 focus:outline-none">
+                  <img src={(currentUser as any).imageUrl} alt="profile" className="w-9 h-9 rounded-full object-cover"/>
+                  <span className="hidden sm:inline text-gray-700 font-medium">{(currentUser as any).name}</span>
+                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
+                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsDropdownOpen(false)}>My Profile</Link>
+                    <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Log Out</button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link to="/login" className="text-gray-500 hover:text-blue-600">Log In</Link>

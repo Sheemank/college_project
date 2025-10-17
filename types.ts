@@ -1,4 +1,7 @@
 
+export type DayOfWeek = 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+export type TimeSlot = string; // e.g., "9:00 AM - 11:00 AM"
+
 export interface Tutor {
   id: string;
   name: string;
@@ -11,6 +14,7 @@ export interface Tutor {
   experience: number; // in years
   qualifications: string[];
   hourlyRate: number;
+  availability: Partial<Record<DayOfWeek, TimeSlot[]>>;
   isVerified: boolean;
 }
 

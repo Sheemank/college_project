@@ -76,6 +76,10 @@ const LoginPage = () => {
               />
             </div>
           </div>
+            
+          <p className="mt-2 text-center text-xs text-gray-500">
+            Hint: Use <b>test@example.com</b> for student, or <b>eleanor@example.com</b> for tutor. Password is <b>password</b>.
+          </p>
 
           <div className="flex items-center justify-between">
             <div className="text-sm">

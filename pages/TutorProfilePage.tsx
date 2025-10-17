@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import type { Tutor } from '../types';
@@ -5,6 +6,7 @@ import { api } from '../services/api';
 import StarIcon from '../components/icons/StarIcon';
 import MessageModal from '../components/MessageModal';
 import VerifiedIcon from '../components/icons/VerifiedIcon';
+import AvailabilityDisplay from '../components/AvailabilityDisplay';
 
 const TutorProfilePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -67,13 +69,20 @@ const TutorProfilePage = () => {
                   </div>
                 )}
                 <p className="text-gray-500 mt-2">{tutor.location}</p>
-                <div className="flex justify-center items-center mt-2">
-                  <div className="flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => <StarIcon key={i} isFilled={i < Math.round(tutor.rating)} className="h-5 w-5" />)}
+                
+                {/* Enhanced Rating Section */}
+                <div className="mt-4 border-t pt-4">
+                  <div className="flex justify-center items-center">
+                      <span className="text-3xl font-bold text-gray-800">{tutor.rating.toFixed(1)}</span>
+                      <div className="ml-2">
+                          <div className="flex text-yellow-400">
+                              {[...Array(5)].map((_, i) => <StarIcon key={i} isFilled={i < Math.round(tutor.rating)} className="h-5 w-5" />)}
+                          </div>
+                          <p className="text-xs text-gray-500 text-left">({tutor.reviewCount} reviews)</p>
+                      </div>
                   </div>
-                  <span className="ml-2 text-gray-600 font-medium">{tutor.rating.toFixed(1)}</span>
-                  <span className="ml-1 text-gray-400 text-sm">({tutor.reviewCount} reviews)</span>
                 </div>
+
                 <p className="text-4xl font-bold text-gray-800 mt-4">${tutor.hourlyRate}<span className="text-lg font-normal text-gray-500">/hr</span></p>
                 <button 
                   onClick={handleContactClick}
@@ -88,6 +97,11 @@ const TutorProfilePage = () => {
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold text-gray-800 border-b pb-3 mb-4">About {tutor.name}</h2>
                 <p className="text-gray-600 leading-relaxed">{tutor.description}</p>
+                
+                <div className="mt-6">
+                  <h3 className="font-semibold text-gray-700 mb-2">Availability</h3>
+                  <AvailabilityDisplay availability={tutor.availability} />
+                </div>
                 
                 <div className="mt-6">
                   <h3 className="font-semibold text-gray-700 mb-2">Subjects</h3>
