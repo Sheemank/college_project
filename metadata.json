@@ -1,0 +1,5 @@
+{
+  "name": "FindMyTutor",
+  "description": "A web platform to connect students with qualified tutors based on location and subject. Tutors can create profiles, and students can search, evaluate, and contact them.",
+  "requestFramePermissions": []
+}
