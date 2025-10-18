@@ -8,14 +8,15 @@ const InboxPage = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null') as User | null;
+  const [currentUser] = useState<User | null>(() => {
+    const userJson = localStorage.getItem('currentUser');
+    return userJson ? JSON.parse(userJson) : null;
+  });
 
   const fetchConversations = useCallback(async () => {
     if (!currentUser) {
         return;
     }
-    // Set loading to false initially for subsequent fetches to avoid spinner on refresh
-    setIsLoading(conversations.length === 0);
     try {
       const convos = await api.getConversations(currentUser.id);
       setConversations(convos);
@@ -24,7 +25,7 @@ const InboxPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentUser, conversations.length]);
+  }, [currentUser]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -66,10 +67,10 @@ const InboxPage = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Inbox</h1>
+      <h1 className="text-3xl font-bold text-slate-800 mb-8">Inbox</h1>
       <div className="bg-white rounded-lg shadow-md">
         {conversations.length > 0 ? (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-slate-200">
             {conversations.map(convo => {
               const otherParticipant = getOtherParticipant(convo);
               const lastMessage = getLastMessage(convo);
@@ -77,16 +78,16 @@ const InboxPage = () => {
 
               return (
                 <li key={convo.id}>
-                  <Link to={`/conversation/${convo.id}`} className="block hover:bg-gray-50 p-4 sm:p-6">
+                  <Link to={`/conversation/${convo.id}`} className="block hover:bg-slate-50 p-4 sm:p-6">
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0">
                         <img className="h-12 w-12 rounded-full object-cover" src={otherParticipant.imageUrl} alt={otherParticipant.name} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-md font-bold text-blue-600 truncate">{otherParticipant.name}</p>
-                        <p className="text-sm text-gray-500 truncate">{lastMessage.senderId === currentUser?.id ? 'You: ' : ''}{lastMessage.text}</p>
+                        <p className="text-md font-bold text-indigo-600 truncate">{otherParticipant.name}</p>
+                        <p className="text-sm text-slate-500 truncate">{lastMessage.senderId === currentUser?.id ? 'You: ' : ''}{lastMessage.text}</p>
                       </div>
-                      <div className="text-sm text-gray-400 text-right flex-shrink-0">
+                      <div className="text-sm text-slate-400 text-right flex-shrink-0">
                         {new Date(lastMessage.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                         <br/>
                         {new Date(lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -99,8 +100,8 @@ const InboxPage = () => {
           </ul>
         ) : (
           <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-gray-700">No conversations yet</h3>
-            <p className="text-gray-500 mt-2">Start a conversation by contacting a tutor from their profile page.</p>
+            <h3 className="text-xl font-semibold text-slate-700">No conversations yet</h3>
+            <p className="text-slate-500 mt-2">Start a conversation by contacting a tutor from their profile page.</p>
           </div>
         )}
       </div>

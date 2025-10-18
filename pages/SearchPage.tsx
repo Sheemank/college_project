@@ -3,8 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import type { Tutor } from '../types';
 import { api } from '../services/api';
 import TutorCard from '../components/TutorCard';
+import { useDebounce } from '../hooks/useDebounce';
 
 const PAGE_SIZE = 4;
+const DEBOUNCE_DELAY = 300;
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,12 +15,19 @@ const SearchPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
 
-  // Form state
+  // Form state for immediate input feedback
   const [location, setLocation] = useState(searchParams.get('location') || '');
   const [subject, setSubject] = useState(searchParams.get('subject') || '');
   const [minRate, setMinRate] = useState(searchParams.get('minRate') || '');
   const [maxRate, setMaxRate] = useState(searchParams.get('maxRate') || '');
   const [minExperience, setMinExperience] = useState(searchParams.get('minExperience') || '');
+
+  // Debounce the form inputs
+  const debouncedLocation = useDebounce(location, DEBOUNCE_DELAY);
+  const debouncedSubject = useDebounce(subject, DEBOUNCE_DELAY);
+  const debouncedMinRate = useDebounce(minRate, DEBOUNCE_DELAY);
+  const debouncedMaxRate = useDebounce(maxRate, DEBOUNCE_DELAY);
+  const debouncedMinExperience = useDebounce(minExperience, DEBOUNCE_DELAY);
 
   const fetchTutors = useCallback(async (isNewSearch: boolean) => {
     setIsLoading(true);
@@ -50,19 +59,31 @@ const SearchPage = () => {
     }
   }, [offset, searchParams]);
   
+  // This effect updates the URL search params when debounced values change.
+  useEffect(() => {
+    const params: { [key: string]: string } = {};
+    if (debouncedLocation) params.location = debouncedLocation;
+    if (debouncedSubject) params.subject = debouncedSubject;
+    if (debouncedMinRate) params.minRate = debouncedMinRate;
+    if (debouncedMaxRate) params.maxRate = debouncedMaxRate;
+    if (debouncedMinExperience) params.minExperience = debouncedMinExperience;
+
+    const newSearchParams = new URLSearchParams(params);
+    if (newSearchParams.toString() !== searchParams.toString()) {
+      setSearchParams(newSearchParams, { replace: true });
+    }
+  }, [debouncedLocation, debouncedSubject, debouncedMinRate, debouncedMaxRate, debouncedMinExperience, setSearchParams, searchParams]);
+  
+  // This effect fetches tutors whenever the searchParams in the URL change.
   useEffect(() => {
     setTutors([]);
     setOffset(0);
     setHasMore(true);
-    // This effect is triggered by searchParams change. 
-    // We use a timeout to avoid a flash of 'no results' when the page loads before fetchTutors is called.
-    const timer = setTimeout(() => {
-        fetchTutors(true);
-    }, 0);
-    return () => clearTimeout(timer);
+    fetchTutors(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // handleSearch now immediately updates search params for an explicit button click.
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params: { [key: string]: string } = {};
@@ -86,7 +107,7 @@ const SearchPage = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Find Your Tutor</h2>
+        <h2 className="text-2xl font-bold text-slate-800 mb-6">Find Your Tutor</h2>
         <form onSubmit={handleSearch} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input 
@@ -94,20 +115,20 @@ const SearchPage = () => {
               placeholder="Location (e.g., New York, NY)" 
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
             <input 
               type="text" 
               placeholder="Subject (e.g., Physics)" 
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t">
             <div>
-              <label htmlFor="minRate" className="block text-sm font-medium text-gray-700 mb-1">Min Rate ($/hr)</label>
+              <label htmlFor="minRate" className="block text-sm font-medium text-slate-700 mb-1">Min Rate ($/hr)</label>
               <input
                   id="minRate"
                   type="number"
@@ -115,11 +136,11 @@ const SearchPage = () => {
                   value={minRate}
                   onChange={(e) => setMinRate(e.target.value)}
                   min="0"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   />
             </div>
             <div>
-              <label htmlFor="maxRate" className="block text-sm font-medium text-gray-700 mb-1">Max Rate ($/hr)</label>
+              <label htmlFor="maxRate" className="block text-sm font-medium text-slate-700 mb-1">Max Rate ($/hr)</label>
               <input
                   id="maxRate"
                   type="number"
@@ -127,11 +148,11 @@ const SearchPage = () => {
                   value={maxRate}
                   onChange={(e) => setMaxRate(e.target.value)}
                   min="0"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   />
             </div>
             <div>
-              <label htmlFor="minExperience" className="block text-sm font-medium text-gray-700 mb-1">Min Experience (years)</label>
+              <label htmlFor="minExperience" className="block text-sm font-medium text-slate-700 mb-1">Min Experience (years)</label>
               <input
                   id="minExperience"
                   type="number"
@@ -139,7 +160,7 @@ const SearchPage = () => {
                   value={minExperience}
                   onChange={(e) => setMinExperience(e.target.value)}
                   min="0"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   />
             </div>
           </div>
@@ -148,11 +169,11 @@ const SearchPage = () => {
              <button
               type="button"
               onClick={handleClearFilters}
-              className="w-full sm:w-auto bg-gray-100 border border-gray-300 text-gray-700 px-8 py-3 rounded-md hover:bg-gray-200 transition-colors font-semibold"
+              className="w-full sm:w-auto bg-slate-100 border border-slate-300 text-slate-700 px-8 py-3 rounded-md hover:bg-slate-200 transition-colors font-semibold"
             >
               Clear Filters
             </button>
-            <button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold disabled:bg-blue-300">
+            <button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-3 rounded-md hover:bg-indigo-700 transition-colors font-semibold disabled:bg-indigo-300">
                 {isLoading ? 'Searching...' : 'Search Tutors'}
             </button>
           </div>
@@ -167,8 +188,8 @@ const SearchPage = () => {
 
       {!isLoading && tutors.length === 0 && (
         <div className="text-center py-16">
-          <h3 className="text-xl font-semibold text-gray-700">No Tutors Found</h3>
-          <p className="text-gray-500 mt-2">Try adjusting your search criteria.</p>
+          <h3 className="text-xl font-semibold text-slate-700">No Tutors Found</h3>
+          <p className="text-slate-500 mt-2">Try adjusting your search criteria.</p>
         </div>
       )}
 
@@ -177,7 +198,7 @@ const SearchPage = () => {
           <button 
             onClick={() => fetchTutors(false)} 
             disabled={isLoading}
-            className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-gray-900 transition-colors font-semibold disabled:bg-gray-400"
+            className="bg-slate-800 text-white px-6 py-3 rounded-md hover:bg-slate-900 transition-colors font-semibold disabled:bg-slate-400"
           >
             {isLoading ? 'Loading...' : 'Show More Tutors'}
           </button>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import useAnimatedCounter from '../hooks/useAnimatedCounter';
 
@@ -13,10 +12,10 @@ const Counter: React.FC<CounterProps> = ({ targetValue, label, suffix }) => {
 
   return (
     <div className="text-center">
-      <span ref={ref} className="text-4xl md:text-5xl font-bold text-blue-600">
+      <span ref={ref} className="text-4xl md:text-5xl font-bold text-indigo-600">
         {count.toLocaleString()}{suffix}
       </span>
-      <p className="mt-2 text-gray-500">{label}</p>
+      <p className="mt-2 text-slate-500">{label}</p>
     </div>
   );
 };

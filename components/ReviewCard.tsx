@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { Review } from '../types';
 
@@ -12,11 +11,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       <div className="flex items-center mb-4">
         <img src={review.studentImageUrl} alt={review.studentName} className="w-14 h-14 rounded-full object-cover mr-4" />
         <div>
-          <p className="font-bold text-gray-800">{review.studentName}</p>
-          <p className="text-sm text-gray-500">Verified Student</p>
+          <p className="font-bold text-slate-800">{review.studentName}</p>
+          <p className="text-sm text-slate-500">Verified Student</p>
         </div>
       </div>
-      <p className="text-gray-600 italic">"{review.text}"</p>
+      <p className="text-slate-600 italic">"{review.text}"</p>
     </div>
   );
 };

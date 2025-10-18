@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { Tutor, DayOfWeek, TimeSlot } from '../types';
 
@@ -65,9 +64,9 @@ const AvailabilityEditor: React.FC<AvailabilityEditorProps> = ({ value, onChange
               id={`day-${day}`}
               checked={!!value[day]}
               onChange={(e) => handleDayToggle(day, e.target.checked)}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
             />
-            <label htmlFor={`day-${day}`} className="ml-2 block text-sm font-medium text-gray-700">{day}</label>
+            <label htmlFor={`day-${day}`} className="ml-2 block text-sm font-medium text-slate-700">{day}</label>
           </div>
           {value[day] && (
             <div className="pl-6 mt-2 space-y-2">
@@ -78,7 +77,7 @@ const AvailabilityEditor: React.FC<AvailabilityEditorProps> = ({ value, onChange
                     value={slot}
                     onChange={(e) => handleTimeSlotChange(day, index, e.target.value)}
                     placeholder="e.g., 9:00 AM - 11:00 AM"
-                    className="flex-grow px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-grow px-3 py-1.5 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                   />
                   <button
                     type="button"
@@ -93,7 +92,7 @@ const AvailabilityEditor: React.FC<AvailabilityEditorProps> = ({ value, onChange
               <button
                 type="button"
                 onClick={() => handleAddTimeSlot(day)}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-indigo-600 hover:text-indigo-800"
               >
                 + Add time slot
               </button>

@@ -14,11 +14,11 @@ class MessagingService {
 
   connect(userId: string) {
     this.connectedUserId = userId;
-    console.log(`Messaging service connected for user ${userId}`);
+    console.debug(`Messaging service connected for user ${userId}`);
   }
 
   disconnect() {
-    console.log(`Messaging service disconnected for user ${this.connectedUserId}`);
+    console.debug(`Messaging service disconnected for user ${this.connectedUserId}`);
     this.connectedUserId = null;
   }
 
